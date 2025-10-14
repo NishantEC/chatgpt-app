@@ -1,6 +1,7 @@
 import { baseURL } from "@/baseUrl";
-import { createMcpHandler } from "mcp-handler";
+import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
+import { verifyToken } from "./auth";
 
 const getAppsSdkCompatibleHtml = async (baseUrl: string, path: string) => {
   const result = await fetch(`${baseUrl}${path}`);
@@ -101,5 +102,10 @@ const handler = createMcpHandler(async (server) => {
   );
 });
 
-export const GET = handler;
-export const POST = handler;
+const authHandler = withMcpAuth(handler, verifyToken, {
+  required: true,
+  requiredScopes: ["read:content"],
+});
+
+export const GET = authHandler;
+export const POST = authHandler;
