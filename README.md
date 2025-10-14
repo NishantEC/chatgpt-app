@@ -1,319 +1,151 @@
-# Hono + Vite + ChatGPT Widgets Starter
+# ChatGPT Apps SDK Next.js Starter
 
-Minimal template for building MCP servers with interactive ChatGPT widgets using TanStack Router.
+A minimal Next.js application demonstrating how to build an [OpenAI Apps SDK](https://developers.openai.com/apps-sdk) compatible MCP server with widget rendering in ChatGPT.
 
-## Features
+## Overview
 
-- **Single widget with routing**: One widget bundle with TanStack Router for navigation
-- **2 example tools** with separate views
-- **Type-safe** with Zod schemas
-- **Tailwind CSS** for styling
+This project shows how to integrate a Next.js application with the ChatGPT Apps SDK using the Model Context Protocol (MCP). It includes a working MCP server that exposes tools and resources that can be called from ChatGPT, with responses rendered natively in ChatGPT.
 
-## Quick Start
+## Key Components
+
+### 1. MCP Server Route (`app/mcp/route.ts`)
+
+The core MCP server implementation that exposes tools and resources to ChatGPT.
+
+**Key features:**
+- **Tool registration** with OpenAI-specific metadata
+- **Resource registration** that serves HTML content for iframe rendering
+- **Cross-linking** between tools and resources via `templateUri`
+
+**OpenAI-specific metadata:**
+```typescript
+{
+  "openai/outputTemplate": widget.templateUri,      // Links to resource
+  "openai/toolInvocation/invoking": "Loading...",   // Loading state text
+  "openai/toolInvocation/invoked": "Loaded",        // Completion state text
+  "openai/widgetAccessible": false,                 // Widget visibility
+  "openai/resultCanProduceWidget": true            // Enable widget rendering
+}
+```
+
+Full configuration options: [OpenAI Apps SDK MCP Documentation](https://developers.openai.com/apps-sdk/build/mcp-server)
+
+### 2. Asset Configuration (`next.config.ts`)
+
+**Critical:** Set `assetPrefix` to ensure `/_next/` static assets are fetched from the correct origin:
+
+```typescript
+const nextConfig: NextConfig = {
+  assetPrefix: baseURL,  // Prevents 404s on /_next/ files in iframe
+};
+```
+
+Without this, Next.js will attempt to load assets from the iframe's URL, causing 404 errors.
+
+### 3. CORS Middleware (`middleware.ts`)
+
+Handles browser OPTIONS preflight requests required for cross-origin RSC (React Server Components) fetching during client-side navigation:
+
+```typescript
+export function middleware(request: NextRequest) {
+  if (request.method === "OPTIONS") {
+    // Return 204 with CORS headers
+  }
+  // Add CORS headers to all responses
+}
+```
+
+### 4. SDK Bootstrap (`app/layout.tsx`)
+
+The `<NextChatSDKBootstrap>` component patches browser APIs to work correctly within the ChatGPT iframe:
+
+**What it patches:**
+- `history.pushState` / `history.replaceState` - Prevents full-origin URLs in history
+- `window.fetch` - Rewrites same-origin requests to use the correct base URL
+- `<html>` attribute observer - Prevents ChatGPT from modifying the root element
+
+**Required configuration:**
+```tsx
+<html lang="en" suppressHydrationWarning>
+  <head>
+    <NextChatSDKBootstrap baseUrl={baseURL} />
+  </head>
+  <body>{children}</body>
+</html>
+```
+
+**Note:** `suppressHydrationWarning` is currently required because ChatGPT modifies the initial HTML before the Next.js app hydrates, causing hydration mismatches.
+
+## Getting Started
+
+### Installation
 
 ```bash
-# Install dependencies
-bun install
-
-# Set up public tunnel (ChatGPT widgets require HTTPS, not localhost)
-ngrok http 5173
+npm install
 # or
-cloudflared tunnel --url http://localhost:5173
-
-# Export the HTTPS URL
-export HOST_URL=https://your-tunnel-url.ngrok.io
-
-# Start dev server
-bun run dev
+pnpm install
 ```
+
+### Development
+
+```bash
+npm run dev
+# or
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+### Testing the MCP Server
+
+The MCP server is available at:
+```
+http://localhost:3000/mcp
+```
+
+### Connecting from ChatGPT
+
+1. [Deploy your app to Vercel](https://vercel.com/new/clone?demo-description=Ship%20an%20ChatGPT%20app%20on%20Vercel%20with%20Next.js%20and%20Model%20Context%20Protocol%20%28MCP%29.%0A&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F5TdbPy0tev8hh3rTOsdfMm%2F155b970ca5e75adb74206db26493efc7%2Fimage.png&demo-title=ChatGPT%20app%20with%20Next.js&demo-url=https%3A%2F%2Fchatgpt-apps-sdk-nextjs-starter.labs.vercel.dev%2F&from=templates&project-name=ChatGPT%20app%20with%20Next.js&project-names=Comma%20separated%20list%20of%20project%20names%2Cto%20match%20the%20root-directories&repository-name=chatgpt-app-with-next-js&repository-url=https%3A%2F%2Fgithub.com%2Fvercel-labs%2Fchatgpt-apps-sdk-nextjs-starter&root-directories=List%20of%20directory%20paths%20for%20the%20directories%20to%20clone%20into%20projects&skippable-integrations=1&teamSlug=vercel)
+3. In ChatGPT, navigate to **Settings → [Connectors](https://chatgpt.com/#settings/Connectors) → Create** and add your MCP server URL with the `/mcp` path (e.g., `https://your-app.vercel.app/mcp`)
+
+**Note:** Connecting MCP servers to ChatGPT requires developer mode access. See the [connection guide](https://developers.openai.com/apps-sdk/deploy/connect-chatgpt) for setup instructions.
+
 
 ## Project Structure
 
 ```
-src/
-├── server/index.ts              # MCP server
-├── types/index.ts               # Zod schemas
-└── widgets/
-    ├── widget.tsx               # Main widget entry point
-    ├── routes.tsx               # TanStack Router setup
-    ├── NavigationSync.tsx       # Syncs tool output with routes
-    ├── openai-types.ts          # OpenAI API types
-    ├── index.css                # Shared styles
-    └── components/
-        ├── LoadingWidget.tsx    # Loading state
-        ├── ItemListWidget.tsx   # List view
-        └── ItemDetailWidget.tsx # Detail view
+app/
+├── mcp/
+│   └── route.ts          # MCP server with tool/resource registration
+├── layout.tsx            # Root layout with SDK bootstrap
+├── page.tsx              # Homepage content
+└── globals.css           # Global styles
+middleware.ts             # CORS handling for RSC
+next.config.ts            # Asset prefix configuration
 ```
 
 ## How It Works
 
-### 1. Single Widget with Router
+1. **Tool Invocation**: ChatGPT calls a tool registered in `app/mcp/route.ts`
+2. **Resource Reference**: Tool response includes `templateUri` pointing to a registered resource
+3. **Widget Rendering**: ChatGPT fetches the resource HTML and renders it in an iframe
+4. **Client Hydration**: Next.js hydrates the app inside the iframe with patched APIs
+5. **Navigation**: Client-side navigation uses patched `fetch` to load RSC payloads
 
-All tools reference the same widget URI. The widget uses TanStack Router to show different views:
+## Learn More
 
-```typescript
-// Server: All tools use the same widget
-const WIDGET_URI = "ui://widget/index.html";
+- [OpenAI Apps SDK Documentation](https://developers.openai.com/apps-sdk)
+- [OpenAI Apps SDK - MCP Server Guide](https://developers.openai.com/apps-sdk/build/mcp-server)
+- [Model Context Protocol](https://modelcontextprotocol.io)
+- [Next.js Documentation](https://nextjs.org/docs)
 
-mcp.tool("list_items", {
-  _meta: {
-    "openai/outputTemplate": WIDGET_URI  // Same URI for all tools
-  },
-  handler: async () => ({
-    structuredContent: {
-      kind: "item_list",  // Discriminator for routing
-      items: [...]
-    }
-  })
-});
-```
+## Deployment
 
-### 2. Route Configuration
+This project is designed to work seamlessly with [Vercel](https://vercel.com) deployment. The `baseUrl.ts` configuration automatically detects Vercel environment variables and sets the correct asset URLs.
 
-Routes defined in `src/widgets/routes.tsx`:
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel-labs/chatgpt-apps-sdk-nextjs-starter)
 
-```typescript
-const listRoute = createRoute({
-  path: "/list",
-  component: ItemListWidget,
-});
-
-const detailRoute = createRoute({
-  path: "/detail/$itemId",
-  component: ItemDetailWidget,
-});
-```
-
-### 3. NavigationSync Component
-
-Watches tool output and navigates to the appropriate route based on the `kind` discriminator:
-
-```typescript
-// src/widgets/NavigationSync.tsx
-export function NavigationSync() {
-  const data = useToolOutput();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!data) return;
-
-    switch (data.kind) {
-      case "item_list":
-        navigate({ to: "/list" });
-        break;
-      case "item_detail":
-        navigate({ to: "/detail/$itemId", params: { itemId: data.id } });
-        break;
-    }
-  }, [data, navigate]);
-
-  return null;
-}
-```
-
-### 4. Widget Components
-
-Components use useState/useEffect to initialize from OpenAI API:
-
-```typescript
-export function ItemListWidget() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    const openai = getOpenAI();
-    const initialData = openai?.widgetState || openai?.toolOutput;
-    if (initialData && "items" in initialData) {
-      setItems(initialData.items);
-    }
-    setTheme(openai?.theme || "light");
-
-    function handleGlobalsChange() {
-      setTheme(getOpenAI()?.theme || "light");
-    }
-    window.addEventListener("openai:set_globals", handleGlobalsChange);
-    return () => window.removeEventListener("openai:set_globals", handleGlobalsChange);
-  }, []);
-
-  // ... render UI
-}
-```
-
-## Adding a New View
-
-1. **Create a component** in `src/widgets/components/`:
-
-```tsx
-// src/widgets/components/MyWidget.tsx
-import { useState, useEffect } from "react";
-import { getOpenAI } from "../openai-types";
-
-export function MyWidget() {
-  const [data, setData] = useState(null);
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    const openai = getOpenAI();
-    const initialData = openai?.widgetState || openai?.toolOutput;
-    setData(initialData);
-    setTheme(openai?.theme || "light");
-  }, []);
-
-  return <div className="p-6">My Widget Content</div>;
-}
-```
-
-2. **Add a route** in `src/widgets/routes.tsx`:
-
-```typescript
-import { MyWidget } from "./components/MyWidget";
-
-const myRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/my-view",
-  component: MyWidget,
-});
-
-// Add to routeTree
-const routeTree = rootRoute.addChildren([
-  loadingRoute,
-  listRoute,
-  detailRoute,
-  myRoute,  // Add here
-]);
-```
-
-3. **Update NavigationSync** in `src/widgets/NavigationSync.tsx`:
-
-```typescript
-switch (data.kind) {
-  case "item_list":
-    navigate({ to: "/list" });
-    break;
-  case "item_detail":
-    navigate({ to: "/detail/$itemId", params: { itemId: data.id } });
-    break;
-  case "my_kind":  // Add your case
-    navigate({ to: "/my-view" });
-    break;
-}
-```
-
-4. **Add a tool** in `src/server/index.ts`:
-
-```typescript
-mcp.tool("my_tool", {
-  _meta: widgetMeta("Loading", "Loaded"),
-  handler: async () => ({
-    structuredContent: {
-      kind: "my_kind",  // Matches NavigationSync switch
-      // ... your data
-    }
-  })
-});
-```
-
-5. **Define types** in `src/types/index.ts`:
-
-```typescript
-export const MyOutputSchema = z.object({
-  kind: z.literal("my_kind"),
-  // ... your fields
-});
-
-export type MyOutput = z.infer<typeof MyOutputSchema>;
-
-export type WidgetState =
-  | ItemListOutput
-  | ItemDetailOutput
-  | MyOutput;  // Add to union
-```
-
-## Key Patterns
-
-### Widget Data Access
-
-```typescript
-import { getOpenAI } from "./openai-types";
-
-// Access tool output
-const data = getOpenAI()?.toolOutput;
-
-// Check theme
-const isDark = getOpenAI()?.theme === "dark";
-
-// Call tools from widget
-await getOpenAI()?.callTool("my_tool", { args });
-
-// Send follow-up message
-await getOpenAI()?.sendFollowUpMessage({
-  prompt: "Show me more details"
-});
-```
-
-### Route Parameters
-
-```tsx
-import { useParams } from "@tanstack/react-router";
-
-export function ItemDetailWidget() {
-  const { itemId } = useParams({ strict: false });
-  // Use itemId in your component
-}
-```
-
-## Important Gotchas
-
-### Localhost Not Supported
-
-ChatGPT widgets require a publicly accessible HTTPS URL. Use:
-- ngrok: `ngrok http 5173`
-- Cloudflare Tunnel: `cloudflared tunnel --url http://localhost:5173`
-- Production: Deploy to real domain
-
-### HOST_URL Must Match
-
-Set `HOST_URL` in:
-1. Environment variable
-2. vite.config.ts `base` path
-3. Resource CSP `connect_domains` and `resource_domains`
-
-### Correct MIME Type
-
-Resources MUST use `text/html+skybridge` - other types won't work.
-
-### Discriminated Unions
-
-All output types MUST have a unique `kind` field for routing:
-- `kind: "item_list"` → routes to `/list`
-- `kind: "item_detail"` → routes to `/detail/$itemId`
-
-## Production Deployment
-
-1. **HTTPS required** - ChatGPT only loads widgets over HTTPS
-2. **Build first** - Run `bun run build` to generate widget bundle
-3. **Persistent storage** - Replace in-memory `items` with a database
-4. **Session management** - Implement session/request adapters for MCP transport
-
-## Build Output
-
-```bash
-bun run build
-
-# Generates:
-dist/
-├── index.html
-└── assets/
-    ├── index-[hash].js
-    └── index-[hash].css
-```
-
-The server reads `dist/index.html` for the widget resource and serves the assets (JS/CSS) via static file serving with CORS headers.
-
-## Resources
-
-- [ChatGPT Apps SDK](https://developers.openai.com/apps-sdk/build/mcp-server)
-- [MCP Lite](https://github.com/fiberplane/mcp-lite)
-- [TanStack Router](https://tanstack.com/router)
-- [Hono](https://hono.dev)
-- [Tailwind CSS v4](https://tailwindcss.com)
+The configuration automatically handles:
+- Production URLs via `VERCEL_PROJECT_PRODUCTION_URL`
+- Preview/branch URLs via `VERCEL_BRANCH_URL`
+- Asset prefixing for correct resource loading in iframes
