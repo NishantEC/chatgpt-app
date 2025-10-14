@@ -1,1 +1,1 @@
-export const HOST_URL = "https://ed4df19a03a9.ngrok-free.app";
+export const HOST_URL = "https://chatgpt-app-production.up.railway.app";
