@@ -1,7 +1,13 @@
 "use client";
 
-import { useWidgetProps, useMaxHeight, useDisplayMode, useRequestDisplayMode } from "../../hooks";
+import {
+  useWidgetProps,
+  useMaxHeight,
+  useDisplayMode,
+  useRequestDisplayMode,
+} from "../../hooks";
 import { formatTimestamp } from "../../utils/formatting";
+import type { ShowProfileOutput } from "./types";
 
 export default function ShowProfileWidget() {
   const toolOutput = useWidgetProps<{
@@ -131,7 +137,10 @@ export default function ShowProfileWidget() {
                   No Profile Data
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                  <p>Profile information is not available. This widget requires authentication.</p>
+                  <p>
+                    Profile information is not available. This widget requires
+                    authentication.
+                  </p>
                 </div>
               </div>
             </div>
@@ -140,19 +149,11 @@ export default function ShowProfileWidget() {
 
         <div className="text-center">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            This widget displays the authenticated user's profile information from the MCP server.
+            This widget displays the authenticated user's profile information
+            from the MCP server.
           </p>
         </div>
       </div>
     </div>
   );
-}
-
-// Type definition for the profile output
-interface ShowProfileOutput {
-  userId: string;
-  email: string;
-  token: string;
-  scopes: string[];
-  timestamp: string;
 }

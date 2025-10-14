@@ -32,23 +32,65 @@ const handleShowContent = async ({ name }: ShowContentInput) => {
 
 // Resource provider for show_content widget
 const provideShowContentResource = async (uri: URL) => {
-  const html = await fetchHtmlContent(baseURL, "/widgets/show-content");
+  try {
+    // Use the correct base URL and fetch the actual widget page
+    const baseUrl =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "https://nextjs.org/docs";
 
-  return {
-    contents: [
-      {
-        uri: uri.href,
-        mimeType: MIME_TYPES.HTML_SKYBRIDGE,
-        text: wrapHtmlContent(html),
-        _meta: {
-          [WIDGET_META_KEYS.WIDGET_DESCRIPTION]: showContentWidget.description,
-          [WIDGET_META_KEYS.WIDGET_PREFERS_BORDER]:
-            WIDGET_DEFAULTS.WIDGET_PREFERS_BORDER,
-          [WIDGET_META_KEYS.WIDGET_DOMAIN]: showContentWidget.widgetDomain,
+    const html = await fetchHtmlContent(baseUrl, "/widgets/show-content");
+
+    return {
+      contents: [
+        {
+          uri: uri.href,
+          mimeType: MIME_TYPES.HTML_SKYBRIDGE,
+          text: wrapHtmlContent(html),
+          _meta: {
+            [WIDGET_META_KEYS.WIDGET_DESCRIPTION]:
+              showContentWidget.description,
+            [WIDGET_META_KEYS.WIDGET_PREFERS_BORDER]:
+              WIDGET_DEFAULTS.WIDGET_PREFERS_BORDER,
+            [WIDGET_META_KEYS.WIDGET_DOMAIN]: showContentWidget.widgetDomain,
+          },
         },
-      },
-    ],
-  };
+      ],
+    };
+  } catch (error) {
+    console.error("Failed to fetch widget HTML:", error);
+    // Fallback to a simple HTML response if fetching fails
+    const fallbackHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head><title>Content Widget</title></head>
+        <body>
+          <h1>Show Content Widget</h1>
+          <p>This widget displays homepage content with user name.</p>
+          <p>Error: Unable to fetch widget content. Please try again later.</p>
+        </body>
+      </html>
+    `;
+
+    return {
+      contents: [
+        {
+          uri: uri.href,
+          mimeType: MIME_TYPES.HTML_SKYBRIDGE,
+          text: fallbackHtml,
+          _meta: {
+            [WIDGET_META_KEYS.WIDGET_DESCRIPTION]:
+              showContentWidget.description,
+            [WIDGET_META_KEYS.WIDGET_PREFERS_BORDER]:
+              WIDGET_DEFAULTS.WIDGET_PREFERS_BORDER,
+            [WIDGET_META_KEYS.WIDGET_DOMAIN]: showContentWidget.widgetDomain,
+          },
+        },
+      ],
+    };
+  }
 };
 
 // Main registration function for show-content widget
