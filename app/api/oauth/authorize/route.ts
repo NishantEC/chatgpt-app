@@ -5,8 +5,21 @@ export async function GET(request: NextRequest) {
   const clientId = searchParams.get("client_id");
   const redirectUri = searchParams.get("redirect_uri");
   const state = searchParams.get("state");
+  const responseType = searchParams.get("response_type");
 
-  // For now, redirect to login page with the OAuth parameters
+  // For client_credentials flow, return token directly
+  if (responseType === "token" || !responseType) {
+    const token = "test-bearer-token-12345";
+    const redirectUrl = new URL(redirectUri || "/auth/login", request.url);
+    redirectUrl.searchParams.set("access_token", token);
+    redirectUrl.searchParams.set("token_type", "Bearer");
+    redirectUrl.searchParams.set("expires_in", "3600");
+    if (state) redirectUrl.searchParams.set("state", state);
+
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // For authorization_code flow, redirect to login page
   const loginUrl = new URL("/auth/login", request.url);
   loginUrl.searchParams.set("client_id", clientId || "");
   loginUrl.searchParams.set("redirect_uri", redirectUri || "");
