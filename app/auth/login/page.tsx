@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const HARDCODED_EMAIL = "admin@example.com";
 const HARDCODED_PASSWORD = "password123";
@@ -13,13 +14,29 @@ export default function LoginPage() {
   const [showToken, setShowToken] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const searchParams = useSearchParams();
+
+  const clientId = searchParams.get("client_id");
+  const redirectUri = searchParams.get("redirect_uri");
+  const state = searchParams.get("state");
+  const isOAuthFlow = clientId && redirectUri;
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (email === HARDCODED_EMAIL && password === HARDCODED_PASSWORD) {
-      setShowToken(true);
+      if (isOAuthFlow) {
+        // Redirect back to ChatGPT with authorization code
+        const authCode = "auth_code_" + Date.now();
+        const redirectUrl = new URL(redirectUri);
+        redirectUrl.searchParams.set("code", authCode);
+        if (state) redirectUrl.searchParams.set("state", state);
+
+        window.location.href = redirectUrl.toString();
+      } else {
+        setShowToken(true);
+      }
     } else {
       setError("Invalid email or password");
     }
@@ -108,9 +125,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             MCP Authentication
           </h1>
-          <p className="text-gray-600">
-            Login to get your Bearer token
-          </p>
+          <p className="text-gray-600">Login to get your Bearer token</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
@@ -177,4 +192,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
