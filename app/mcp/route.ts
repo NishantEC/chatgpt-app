@@ -69,6 +69,7 @@ const handler = createMcpHandler(async (server) => {
     })
   );
 
+  // @ts-ignore ignore zod type error
   server.registerTool(
     contentWidget.id,
     {
@@ -76,7 +77,9 @@ const handler = createMcpHandler(async (server) => {
       description:
         "Fetch and display the homepage content with the name of the user",
       inputSchema: {
-        name: z.string().describe("The name of the user to display on the homepage"),
+        name: z
+          .string()
+          .describe("The name of the user to display on the homepage"),
       },
       _meta: widgetMeta(contentWidget),
     },
