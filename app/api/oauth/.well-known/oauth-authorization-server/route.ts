@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
     ],
     code_challenge_methods_supported: ["S256"],
     registration_endpoint_auth_methods_supported: ["none"],
+    // Force deployment update
+    version: "1.0.1",
   };
 
   return NextResponse.json(config, {
