@@ -4,10 +4,15 @@ export async function GET(request: NextRequest) {
   const baseUrl =
     process.env.VERCEL_PROJECT_PRODUCTION_URL || "http://localhost:3000";
 
+  // Ensure the baseUrl has the correct protocol
+  const fullBaseUrl = baseUrl.startsWith("http")
+    ? baseUrl
+    : `https://${baseUrl}`;
+
   const config = {
-    issuer: `${baseUrl}/api/oauth`,
-    authorization_endpoint: `${baseUrl}/api/oauth/authorize`,
-    token_endpoint: `${baseUrl}/api/oauth/token`,
+    issuer: `${fullBaseUrl}/api/oauth`,
+    authorization_endpoint: `${fullBaseUrl}/api/oauth/authorize`,
+    token_endpoint: `${fullBaseUrl}/api/oauth/token`,
     scopes_supported: ["read:content", "write:content"],
     response_types_supported: ["code"],
     grant_types_supported: ["authorization_code", "client_credentials"],

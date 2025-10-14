@@ -5,9 +5,10 @@ import {
 
 const baseUrl =
   process.env.VERCEL_PROJECT_PRODUCTION_URL || "http://localhost:3000";
+const fullBaseUrl = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
 
 const handler = protectedResourceHandler({
-  authServerUrls: [`${baseUrl}/api/oauth`],
+  authServerUrls: [`${fullBaseUrl}/api/oauth`],
 });
 
 const corsHandler = metadataCorsOptionsRequestHandler();
