@@ -3,10 +3,11 @@ import {
   metadataCorsOptionsRequestHandler,
 } from "mcp-handler";
 
+const baseUrl =
+  process.env.VERCEL_PROJECT_PRODUCTION_URL || "http://localhost:3000";
+
 const handler = protectedResourceHandler({
-  authServerUrls: [
-    process.env.VERCEL_PROJECT_PRODUCTION_URL || "http://localhost:3000",
-  ],
+  authServerUrls: [`${baseUrl}/api/oauth`],
 });
 
 const corsHandler = metadataCorsOptionsRequestHandler();
