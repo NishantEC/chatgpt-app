@@ -322,6 +322,11 @@
   resolved "https://registry.npmjs.org/@hono/node-server/-/node-server-1.19.5.tgz"
   integrity sha512-iBuhh+uaaggeAuf+TftcjZyWh2GEgZcVGXkNtskLVoWaXhnJtC5HLHrU8W1KHDoucqO1MswwglmkWLFyiDn4WQ==
 
+"@hono/vite-build@^1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@hono/vite-build/-/vite-build-1.7.0.tgz#eddcd978ab80d9eaf4d3cca60eea0703d08ddf05"
+  integrity sha512-L73WBed5teC7DHTzXYkho83POYYluD2rTkbT76FJuqpfXPgTW/PsbIa8O0YcCETE3VUoh584fe6vuLAM5ctjww==
+
 "@hono/vite-dev-server@^0.16.0":
   version "0.16.0"
   resolved "https://registry.npmjs.org/@hono/vite-dev-server/-/vite-dev-server-0.16.0.tgz"

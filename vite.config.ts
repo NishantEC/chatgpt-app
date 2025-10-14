@@ -1,4 +1,5 @@
 import devServer from "@hono/vite-dev-server";
+import build from "@hono/vite-build/node";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
@@ -11,6 +12,9 @@ export default defineConfig({
     devServer({
       entry: "src/server/index.ts",
       exclude: [/.*\.tsx?$/, /.*\.(s?css|less)$/, /public\/.*/],
+    }),
+    build({
+      entry: "src/server/index.ts",
     }),
   ],
   server: {
