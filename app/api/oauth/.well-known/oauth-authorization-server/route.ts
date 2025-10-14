@@ -11,7 +11,6 @@ export async function GET(request: NextRequest) {
     issuer: fullBaseUrl,
     authorization_endpoint: `${fullBaseUrl}/api/oauth/authorize`,
     token_endpoint: `${fullBaseUrl}/api/oauth/token`,
-    registration_endpoint: `${fullBaseUrl}/api/oauth/register`,
     scopes_supported: ["read:content", "write:content"],
     response_types_supported: ["code", "token"],
     grant_types_supported: [
@@ -25,9 +24,8 @@ export async function GET(request: NextRequest) {
       "none",
     ],
     code_challenge_methods_supported: ["S256"],
-    registration_endpoint_auth_methods_supported: ["none"],
-    // Force deployment update
-    version: "1.0.1",
+    // Remove registration endpoint for now due to deployment issues
+    version: "1.0.2",
   };
 
   return NextResponse.json(config, {
