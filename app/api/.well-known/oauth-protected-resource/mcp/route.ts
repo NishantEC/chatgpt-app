@@ -8,7 +8,7 @@ const baseUrl =
 const fullBaseUrl = baseUrl.startsWith("http") ? baseUrl : `https://${baseUrl}`;
 
 const handler = protectedResourceHandler({
-  authServerUrls: [`${fullBaseUrl}/api/oauth`],
+  authServerUrls: [fullBaseUrl],
 });
 
 const corsHandler = metadataCorsOptionsRequestHandler();
