@@ -27,8 +27,8 @@ export default function Home() {
           <div className="space-y-3">
             <h2 className="text-xl font-semibold">Available Widgets</h2>
             <div className="space-y-2">
-              <Link 
-                href="/widgets/show-content" 
+              <Link
+                href="/widgets/show-content"
                 className="block p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 <h3 className="font-medium">Show Content Widget</h3>
@@ -36,8 +36,8 @@ export default function Home() {
                   Display homepage content with user name
                 </p>
               </Link>
-              <Link 
-                href="/widgets/show-profile" 
+              <Link
+                href="/widgets/show-profile"
                 className="block p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 <h3 className="font-medium">Show Profile Widget</h3>
