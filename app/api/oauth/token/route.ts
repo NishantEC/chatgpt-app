@@ -2,7 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const contentType = request.headers.get("content-type");
+    let body: any;
+    
+    if (contentType?.includes("application/x-www-form-urlencoded")) {
+      const formData = await request.formData();
+      body = Object.fromEntries(formData.entries());
+    } else {
+      body = await request.json();
+    }
+    
     const { grant_type, client_id, client_secret, code } = body;
 
     // For client_credentials grant type
@@ -14,6 +23,12 @@ export async function POST(request: NextRequest) {
         token_type: "Bearer",
         expires_in: 3600,
         scope: "read:content write:content",
+      }, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
       });
     }
 
@@ -22,7 +37,14 @@ export async function POST(request: NextRequest) {
       if (!code) {
         return NextResponse.json(
           { error: "invalid_request", error_description: "code is required" },
-          { status: 400 }
+          { 
+            status: 400,
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "POST, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            },
+          }
         );
       }
 
@@ -33,17 +55,48 @@ export async function POST(request: NextRequest) {
         token_type: "Bearer",
         expires_in: 3600,
         scope: "read:content write:content",
+      }, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
       });
     }
 
     return NextResponse.json(
       { error: "unsupported_grant_type" },
-      { status: 400 }
+      { 
+        status: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      }
     );
   } catch (error) {
     return NextResponse.json(
       { error: "invalid_request", error_description: "Invalid request body" },
-      { status: 400 }
+      { 
+        status: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
+      }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
 }
