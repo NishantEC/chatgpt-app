@@ -172,7 +172,14 @@ app.all("/mcp", async (c) => {
 });
 
 // Serve static assets from dist/ with CORS headers
-app.use("/*", cors());
+app.use(
+  "/*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["*"],
+  })
+);
 app.use("/*", serveStatic({ root: "./dist" }));
 
 export default app;
