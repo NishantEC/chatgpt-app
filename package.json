@@ -4,9 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && tsc",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/server/index.js"
   },
   "dependencies": {
     "@hono/mcp": "^0.1.4",
