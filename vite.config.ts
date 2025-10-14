@@ -24,17 +24,4 @@ export default defineConfig({
   define: {
     "import.meta.env.HOST_URL": JSON.stringify(HOST_URL),
   },
-  build: {
-    rollupOptions: {
-      input: {
-        app: "index.html",
-        server: "src/server/index.ts",
-      },
-      output: {
-        entryFileNames: (chunkInfo) => {
-          return chunkInfo.name === "server" ? "index.js" : "[name]-[hash].js";
-        },
-      },
-    },
-  },
 });
