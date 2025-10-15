@@ -6,7 +6,7 @@ import { registerShowProfileWidget } from "../widgets/show-profile/handler";
 const handler = createMcpHandler(async (server) => {
   try {
     // Register all widgets
-    await registerShowContentWidget(server);
+    // await registerShowContentWidget(server);
     await registerShowProfileWidget(server);
     // Future widgets can be added here:
     // await registerAnotherWidget(server);
