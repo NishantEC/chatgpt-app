@@ -3,6 +3,7 @@ import { z } from "zod";
 // Input schema for the show_profile tool
 export const ShowProfileInputSchema = {
   // No input required - we'll get user info from auth context
+  // Empty schema but with proper Zod structure
 };
 
 // Input type for the show_profile tool
@@ -23,7 +24,8 @@ export interface ShowProfileOutput {
 export const showProfileWidget = {
   id: "show_profile",
   title: "Show Profile",
-  description: "Display the authenticated user's profile information including token and details",
+  description:
+    "Display the authenticated user's profile information including token and details",
   templateUri: "ui://widget/profile-template.html",
   invoking: "Loading profile...",
   invoked: "Profile loaded",

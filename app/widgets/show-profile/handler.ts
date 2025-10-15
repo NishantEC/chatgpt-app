@@ -104,12 +104,7 @@ export async function registerShowProfileWidget(server: any): Promise<void> {
   await registerWidget(
     server,
     showProfileWidget,
-    {
-      // Empty input schema but with proper structure
-      type: "object",
-      properties: {},
-      required: [],
-    },
+    {},
     handleShowProfile,
     provideShowProfileResource
   );
