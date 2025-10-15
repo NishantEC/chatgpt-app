@@ -11,7 +11,7 @@ import {
   WIDGET_META_KEYS,
   WIDGET_DEFAULTS,
 } from "../../utils/constants";
-import { baseURL } from "@/baseUrl";
+import { baseUrl } from "@/baseUrl";
 
 // Tool handler for show_profile
 const handleShowProfile = async (input: ShowProfileInput) => {
@@ -40,7 +40,7 @@ const handleShowProfile = async (input: ShowProfileInput) => {
 // Resource provider for show_profile widget
 const provideShowProfileResource = async (uri: URL) => {
   try {
-    const html = await fetchHtmlContent(baseURL, "/widgets/show-profile");
+    const html = await fetchHtmlContent(baseUrl, "/widgets/show-profile");
 
     return {
       contents: [

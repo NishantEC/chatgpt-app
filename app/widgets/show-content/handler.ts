@@ -1,4 +1,4 @@
-import { baseURL } from "@/baseUrl";
+import { baseUrl } from "@/baseUrl";
 import { createWidgetMeta } from "../types";
 import {
   showContentWidget,

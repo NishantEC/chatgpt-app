@@ -75,7 +75,7 @@ export const myWidgetConfig = {
 ### 3. Create Handler (`handler.ts`)
 
 ```typescript
-import { baseURL } from "@/baseUrl";
+import { baseUrl } from "@/baseUrl";
 import { createWidgetMeta } from "../types";
 import {
   myWidgetConfig,
@@ -112,7 +112,7 @@ const handleMyWidget = async ({ param1, param2 }: MyWidgetInput) => {
 
 // Resource provider function
 const provideMyWidgetResource = async (uri: URL) => {
-  const html = await fetchHtmlContent(baseURL, "/widgets/my-widget");
+  const html = await fetchHtmlContent(baseUrl, "/widgets/my-widget");
 
   return {
     contents: [

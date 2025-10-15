@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
-import { baseURL } from "./baseUrl";
+import { baseUrl } from "./baseUrl";
 
 const nextConfig: NextConfig = {
-  assetPrefix: baseURL,
+  assetPrefix: baseUrl,
   async rewrites() {
     return [
       {
