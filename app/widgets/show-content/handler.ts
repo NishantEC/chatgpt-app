@@ -33,14 +33,6 @@ const handleShowContent = async ({ name }: ShowContentInput) => {
 // Resource provider for show_content widget
 const provideShowContentResource = async (uri: URL) => {
   try {
-    // Use the correct base URL and fetch the actual widget page
-    const baseUrl =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000"
-        : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "https://nextjs.org/docs";
-
     const html = await fetchHtmlContent(baseUrl, "/widgets/show-content");
 
     return {

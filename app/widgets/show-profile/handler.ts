@@ -11,9 +11,10 @@ import {
   WIDGET_META_KEYS,
   WIDGET_DEFAULTS,
 } from "../../utils/constants";
+import { baseURL } from "@/baseUrl";
 
 // Tool handler for show_profile
-const handleShowProfile = async ({}: ShowProfileInput) => {
+const handleShowProfile = async (input: ShowProfileInput) => {
   // In a real implementation, you would get this from the auth context
   // For now, we'll return mock data that matches the auth structure
   const profileData = {
@@ -39,15 +40,7 @@ const handleShowProfile = async ({}: ShowProfileInput) => {
 // Resource provider for show_profile widget
 const provideShowProfileResource = async (uri: URL) => {
   try {
-    // Use the correct base URL and fetch the actual widget page
-    const baseUrl =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000"
-        : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "https://nextjs.org/docs";
-
-    const html = await fetchHtmlContent(baseUrl, "/widgets/show-profile");
+    const html = await fetchHtmlContent(baseURL, "/widgets/show-profile");
 
     return {
       contents: [
