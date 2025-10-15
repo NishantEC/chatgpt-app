@@ -24,9 +24,8 @@ export interface ShowProfileOutput {
 export const showProfileWidget = {
   id: "show_profile",
   title: "Show Profile",
-  description:
-    "Display the authenticated user's profile information including token and details",
-  templateUri: "ui://widget/profile-template.html",
+  description: "Display the authenticated user's profile information",
+  templateUri: "ui://widget/content-template.html",
   invoking: "Loading profile...",
   invoked: "Profile loaded",
   widgetDomain: "https://nextjs.org/docs",

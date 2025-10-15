@@ -20,7 +20,7 @@ const handleShowProfile = async (input: ShowProfileInput) => {
   const profileData = {
     userId: "admin",
     email: "admin@example.com",
-    token: "test-bearer-token-12345",
+    token: "***hidden***", // Hide sensitive token information
     scopes: ["read:content", "write:content"],
     timestamp: new Date().toISOString(),
   };
