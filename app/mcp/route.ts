@@ -5,9 +5,9 @@ import { registerShowProfileWidget } from "../widgets/show-profile/handler";
 
 const handler = createMcpHandler(async (server) => {
   try {
-    // Temporarily disable widget registration to test if this fixes the "not safe" error
+    // Register all widgets
     await registerShowContentWidget(server);
-    // await registerShowProfileWidget(server);
+    await registerShowProfileWidget(server);
     // Future widgets can be added here:
     // await registerAnotherWidget(server);
   } catch (error) {
